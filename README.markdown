@@ -8,6 +8,10 @@ Paste this code inside HTML head:
 
 ```html
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    jqLiferayAnalytics = jQuery.noConflict(true);
+</script>
+
 <script src="https://js-liferayanalytics.wedeploy.io/analytics.js"></script>
 <script src="https://js-liferayanalytics.wedeploy.io/liferay-analytics-api.js"></script>
 <script src="https://js-liferayanalytics.wedeploy.io/lcs-analytics-processor.js"></script>

@@ -68,7 +68,7 @@
 		pendingFlush = false;
 
 		if (events.length) {
-			$.ajax({
+			jqLiferayAnalytics.ajax({
 				url: requestUri,
 				cache: false,
 				data: JSON.stringify(
@@ -118,7 +118,7 @@
 		analyticsKey = instance.options.analyticsKey;
 		applicationId = instance.options.applicationId;
 		context["url"] = window.location.href;
-		isFunction = jQuery.isFunction;
+		isFunction = jqLiferayAnalytics.isFunction;
 		messageFormat = instance.options.messageFormat;
 		requestInterval = instance.options.interval;
 		requestUri = instance.options.uri;

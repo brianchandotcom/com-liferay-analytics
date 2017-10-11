@@ -469,7 +469,7 @@ each(forms, function(el) {
 
 	// support the events happening through jQuery or Zepto instead of through
 	// the normal DOM API, since `el.submit` doesn't bubble up events...
-	var $ = window.jQuery || window.Zepto;
+	var $ = window.jQuery || window.Zepto || window.jqLiferayAnalytics;
 	if ($) {
 	  $(el).submit(handler);
 	} else {
