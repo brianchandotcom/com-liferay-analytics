@@ -1,3 +1,5 @@
+var Liferay = Liferay || {};
+
 (function outer(modules, cache, entries) {
 
 /**
