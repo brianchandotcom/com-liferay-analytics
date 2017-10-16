@@ -1,0 +1,42 @@
+plugins {
+	id "com.eriwen.gradle.js" version "2.14.1"
+}
+
+def distDir = "${buildDir}/dist"
+def distDirJs = "${distDir}/js"
+
+combineJs {
+	encoding = "UTF-8"
+	source = [
+		"${distDirJs}/analytics.js",
+		"${distDirJs}/liferay-analytics-api.js",
+		"${distDirJs}/lcs-analytics-processor.js"
+	]
+	dest = file("${distDirJs}/analytics-all.js")
+}
+
+minifyJs {
+	source = combineJs
+	dest = file("${distDirJs}/analytics-all-min.js")
+	closure {
+		compilerOptions.languageIn = 'ECMASCRIPT5'
+	}
+}
+
+task copyResources {
+	doLast {
+		copy {
+			from sourceSets.main.resources
+			into distDir
+		}
+	}
+}
+
+minifyJs.dependsOn copyResources
+
+task wedeploy(type: Exec) {
+	workingDir distDir
+	commandLine "we", "deploy", "-p", "liferayanalytics"
+}
+
+wedeploy.dependsOn minifyJs
