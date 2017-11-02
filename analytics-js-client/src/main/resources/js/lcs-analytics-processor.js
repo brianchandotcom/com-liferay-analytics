@@ -7,6 +7,7 @@
 	var requestId;
 	var requestInterval;
 	var requestUri;
+	var userAgent;
 	var context = {};
 
 	var LCSAnalyticsProcessor = Liferay.Analytics.integration('LCSAnalyticsProcessor').readyOnInitialize();
@@ -78,7 +79,9 @@
 						channel: 'web',
 						context: context,
 						events: events,
-						messageFormat: messageFormat
+						messageFormat: messageFormat,
+						protocolVersion: '1.0',
+						userAgent: userAgent
 					}
 				),
 				type: "POST",
@@ -117,11 +120,13 @@
 
 		analyticsKey = instance.options.analyticsKey;
 		applicationId = instance.options.applicationId;
-		context["url"] = window.location.href;
+		context['languageId'] = navigator.language;
+		context['url'] = window.location.href;
 		isFunction = jqLiferayAnalytics.isFunction;
 		messageFormat = instance.options.messageFormat;
 		requestInterval = instance.options.interval;
 		requestUri = instance.options.uri;
+		userAgent = navigator.userAgent;
 	};
 
 	LCSAnalyticsProcessor.prototype.store = function(events) {
