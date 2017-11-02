@@ -73,7 +73,10 @@
 
 		analyticsKey = instance.options.analyticsKey;
 		applicationId = instance.options.applicationId;
+		context['description'] = document.querySelector("meta[name='description']").getAttribute("content");
+		context['keywords'] = document.querySelector("meta[name='keywords']").getAttribute("content");
 		context['languageId'] = navigator.language;
+		context['title'] = document.querySelector("meta[name='title']").getAttribute("content");;
 		context['url'] = window.location.href;
 		isFunction = jqLiferayAnalytics.isFunction;
 		messageFormat = instance.options.messageFormat;
