@@ -32,7 +32,8 @@ task copyResources {
 	}
 }
 
-minifyJs.dependsOn copyResources
+combineJs.dependsOn copyResources
+minifyJs.dependsOn combineJs
 
 task wedeploy(type: Exec) {
 	workingDir distDir
