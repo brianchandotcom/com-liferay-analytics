@@ -68,6 +68,14 @@
 		}
 	};
 
+	LCSAnalyticsProcessor.prototype.getMetaTag = function(tagName) {
+		var instance = this;
+
+		var metaTag = document.querySelector("meta[name='" + tagName +"']");
+
+		return metaTag ? metaTag.getAttribute("content") : '';
+	};
+
 	LCSAnalyticsProcessor.prototype.getPendingEvents = function() {
 		var instance = this;
 
@@ -80,16 +88,23 @@
 		var instance = this;
 
 		analyticsKey = instance.options.analyticsKey;
-		context['description'] = document.querySelector("meta[name='description']").getAttribute("content");
-		context['keywords'] = document.querySelector("meta[name='keywords']").getAttribute("content");
-		context['languageId'] = navigator.language;
-		context['title'] = document.querySelector("meta[name='title']").getAttribute("content");;
-		context['url'] = window.location.href;
-		context['userAgent'] = navigator.userAgent;
 		isFunction = jqLiferayAnalytics.isFunction;
 		requestInterval = instance.options.interval;
 		requestUri = instance.options.uri;
 		userId = 'id-' + Math.random().toString(36).substr(2, 16);
+
+		instance.setContext()
+	};
+
+	LCSAnalyticsProcessor.prototype.setContext = function() {
+		var instance = this;
+
+		context['description'] = instance.getMetaTag('description');
+		context['keywords'] = instance.getMetaTag('keywords');
+		context['languageId'] = navigator.language;
+		context['title'] = instance.getMetaTag('title');
+		context['url'] = window.location.href;
+		context['userAgent'] = navigator.userAgent;
 	};
 
 	LCSAnalyticsProcessor.prototype.store = function(events) {
