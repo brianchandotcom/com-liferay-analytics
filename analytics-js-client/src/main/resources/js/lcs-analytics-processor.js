@@ -1,13 +1,11 @@
 ;(function() {
 	var analyticsKey;
-	var applicationId;
 	var isFunction;
-	var messageFormat;
 	var pendingFlush;
 	var requestId;
 	var requestInterval;
 	var requestUri;
-	var userAgent;
+	var userId;
 	var context = {};
 
 	var LCSAnalyticsProcessor = Liferay.Analytics.integration('LCSAnalyticsProcessor').readyOnInitialize();
@@ -19,6 +17,19 @@
 
 		var events = instance.getPendingEvents();
 
+		for (var k in events) {
+			var event = events[k];
+
+			var properties = event.properties;
+
+			event.applicationId = properties.applicationId || 'Default';
+
+			delete(properties.applicationId);
+
+			event.properties = properties;
+			events[k] = event;
+		}
+
 		pendingFlush = false;
 
 		if (events.length) {
@@ -28,13 +39,10 @@
 				data: JSON.stringify(
 					{
 						analyticsKey: analyticsKey,
-						applicationId: applicationId,
-						channel: 'web',
 						context: context,
 						events: events,
-						messageFormat: messageFormat,
 						protocolVersion: '1.0',
-						userAgent: userAgent
+						userId: userId
 					}
 				),
 				type: "POST",
@@ -42,7 +50,7 @@
 					xhr.setRequestHeader('Content-Type', 'application/json');
 				},
 				error: function(err) {
-					console.error(err.type);
+					console.error(err.responseText);
 				},
 				success: function() {
 					if (isFunction(callback)) {
@@ -72,17 +80,16 @@
 		var instance = this;
 
 		analyticsKey = instance.options.analyticsKey;
-		applicationId = instance.options.applicationId;
 		context['description'] = document.querySelector("meta[name='description']").getAttribute("content");
 		context['keywords'] = document.querySelector("meta[name='keywords']").getAttribute("content");
 		context['languageId'] = navigator.language;
 		context['title'] = document.querySelector("meta[name='title']").getAttribute("content");;
 		context['url'] = window.location.href;
+		context['userAgent'] = navigator.userAgent;
 		isFunction = jqLiferayAnalytics.isFunction;
-		messageFormat = instance.options.messageFormat;
 		requestInterval = instance.options.interval;
 		requestUri = instance.options.uri;
-		userAgent = navigator.userAgent;
+		userId = 'id-' + Math.random().toString(36).substr(2, 16);
 	};
 
 	LCSAnalyticsProcessor.prototype.store = function(events) {
