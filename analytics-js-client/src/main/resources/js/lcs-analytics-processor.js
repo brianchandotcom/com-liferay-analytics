@@ -20,6 +20,10 @@
 		for (var k in events) {
 			var event = events[k];
 
+			event.eventId = event.event;
+
+			delete(event.event);
+
 			var properties = event.properties;
 
 			event.applicationId = properties.applicationId || 'Default';
@@ -27,6 +31,9 @@
 			delete(properties.applicationId);
 
 			event.properties = properties;
+
+			delete(event.timestamp)
+
 			events[k] = event;
 		}
 
