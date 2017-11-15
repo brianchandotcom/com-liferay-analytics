@@ -2,7 +2,7 @@ import schedule from 'schedule';
 import storage from 'metal-storage';
 import LCSClient from './LCSClient';
 
-// activate Middlewares 
+// activate Middlewares
 import './middlewares/default';
 import './middlewares/meta';
 
@@ -15,10 +15,10 @@ const STORAGE_KEY = 'lcs_client_batch';
  * @return {object}
  */
 function serialize(eventId, applicationId, properties) {
-	return { 
+	return {
 		eventId,
 		applicationId,
-		properties
+		properties,
 	};
 }
 
@@ -31,7 +31,7 @@ function timeout(timeout) {
 }
 
 /**
- * Function to handle broken paths 
+ * Function to handle broken paths
  * @param {object} err
  */
 function handleError(err) {
@@ -39,7 +39,6 @@ function handleError(err) {
 }
 
 class Analytics {
-
 	/**
 	 * Returns an Analytics instance and triggers the automatic flush loop
 	 * @param {object} configuration object to instantiate the Analytics tool
@@ -57,7 +56,7 @@ class Analytics {
 	/**
 	 * Registers an event that is to be sent to the LCS endpoint
 	 * @param {string} eventId - Id
-	 * @param {string} applicationId - application 
+	 * @param {string} applicationId - application
 	 * @param {object} eventProps - complementary informations
 	 */
 	send(eventId, applicationId, eventProps) {
@@ -82,19 +81,18 @@ class Analytics {
 	}
 
 	/**
-	 * Sends the event queue to the LCS endpoint 
+	 * Sends the event queue to the LCS endpoint
 	 * @returns {object} Promise
 	 */
 	flush() {
 		// race condition against finishing off before the timeout is triggered
-		return Promise.race([
-			LCSClient.send(this),
-			timeout(REQUEST_TIMEOUT)
-		])
-		// resets our storage if sending the events went down well
-		.then(() => this.reset())
-		// any type of error must be handled 
-		.catch(handleError); 
+		return (
+			Promise.race([LCSClient.send(this), timeout(REQUEST_TIMEOUT)])
+				// resets our storage if sending the events went down well
+				.then(() => this.reset())
+				// any type of error must be handled
+				.catch(handleError)
+		);
 	}
 
 	/**
@@ -108,7 +106,8 @@ class Analytics {
 	/**
 	 * Returns the event queue
 	 * @return {array}
-	 */ 
+	 */
+
 	getEvents() {
 		return this.events;
 	}
@@ -120,8 +119,7 @@ class Analytics {
 	getConfig() {
 		return this.config;
 	}
-
 }
 
-export { Analytics };
+export {Analytics};
 export default Analytics;

@@ -9,8 +9,11 @@ function defaultMiddleware(req, analytics) {
 		protocolVersion: '1.0',
 		userId: config.userId,
 		events
-	}
-	return requestBody; 	
+	};
+	return {
+		...requestBody,
+		...req
+	};
 }
 
 LCSClient.use(defaultMiddleware);
