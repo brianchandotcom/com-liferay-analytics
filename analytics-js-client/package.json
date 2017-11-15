@@ -21,13 +21,16 @@
   },
   "homepage": "https://github.com/liferay/com-liferay-analytics#readme",
   "devDependencies": {
+    "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
-    "babel-plugin-transform-node-env-inline": "^0.2.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "metal-storage": "^1.1.0",
-    "wepback": "^1.0.0"
+    "webpack": "^3.8.1"
   },
   "dependencies": {
     "es6-promise": "^4.1.1",
-    "isomorphic-fetch": "^2.2.1"
+    "isomorphic-fetch": "^2.2.1",
+    "schedule": "^0.1.0"
   }
 }
