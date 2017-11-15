@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const buildFolder = './build';
-const buildName = 'analytis-all-min.js';
+const buildName = 'analytics-all-min.js';
 
 module.exports = {
 	entry: './src/analytics.js',
