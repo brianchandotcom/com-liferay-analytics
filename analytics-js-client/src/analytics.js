@@ -61,8 +61,7 @@ class Analytics {
 	 * @param {object} eventProps - complementary informations
 	 */
 	send(eventId, applicationId, eventProps) {
-		const args = [].slice.call(arguments);
-		const data = serialize(...args);
+		const data = serialize(eventId, applicationId, eventProps);
 		this.events.push(data);
 		this.persist();
 	}
