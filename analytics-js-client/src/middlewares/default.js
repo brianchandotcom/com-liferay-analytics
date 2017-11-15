@@ -1,4 +1,4 @@
-import LCSClient from './LCSClient';
+import LCSClient from '../LCSClient';
 
 function defaultMiddleware(req, analytics) {
 	const events = analytics.getEvents();

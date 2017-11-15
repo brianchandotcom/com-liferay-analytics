@@ -1,4 +1,4 @@
-import LCSClient from './LCSClient';
+import LCSClient from '../LCSClient';
 
 function getQuery(query, attr) {
   return function() {
@@ -18,7 +18,7 @@ function defaultMiddleware(req, analytics) {
     languageId: navigator.language,
     title: getTitle(),
     url: location.href,
-    userAgent: navigator.userAgent
+    userAgent: navigator.userAgent,
     ...req.context
   };
   return req;
