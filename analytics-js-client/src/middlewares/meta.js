@@ -1,5 +1,11 @@
 import LCSClient from '../LCSClient';
 
+/**
+ * Generates a local helper function to fetch information from DOM elements
+ * @param {string} query - query string
+ * @param {string} attr - attribute to fetch
+ * @return {string} value of the specified attribute
+ */
 function getQuery(query, attr) {
 	return function() {
 		const tag = document.querySelector(query) || {};
@@ -7,11 +13,18 @@ function getQuery(query, attr) {
 	};
 }
 
+// shorthand functions
 const getDescription = getQuery('meta[name="description"]', 'content');
 const getKeywords = getQuery('meta[name="keywords"]', 'content');
 const getTitle = getQuery('title', 'innerHTML');
 
-function defaultMiddleware(req, analytics) {
+/**
+ * middleware function that augments the request with context informations
+ * @param {object} req - request object to alter
+ * @param {object} analytics - Analytics instance to extract behaviour informations from it
+ * @return {object} the updated request object
+ */
+function context(req) {
 	req.context = {
 		description: getDescription(),
 		keywords: getKeywords(),
@@ -19,9 +32,10 @@ function defaultMiddleware(req, analytics) {
 		title: getTitle(),
 		url: location.href,
 		userAgent: navigator.userAgent,
-		...req.context
+		...req.context,
 	};
 	return req;
 }
 
-LCSClient.use(defaultMiddleware);
+// registers the middleware
+LCSClient.use(context);
