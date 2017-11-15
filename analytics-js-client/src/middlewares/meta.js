@@ -1,19 +1,15 @@
 import LCSClient from './LCSClient';
 
-function getCachedQuery(query, attr) {
-  let cache;
+function getQuery(query, attr) {
   return function() {
-    if (!cache) {
-      const tag = document.querySelector(query) || {};
-      cache = tag[attr];
-    }
-    return cache;
+    const tag = document.querySelector(query) || {};
+    return tag[attr];
   }
 }
 
-const getDescription = getCachedQuery('meta[name="description"]', 'content');
-const getKeywords = getCachedQuery('meta[name="keywords"]', 'content');
-const getTitle = getCachedQuery('title', 'innerHTML');
+const getDescription = getQuery('meta[name="description"]', 'content');
+const getKeywords = getQuery('meta[name="keywords"]', 'content');
+const getTitle = getQuery('title', 'innerHTML');
 
 function defaultMiddleware(req, analytics) {
   req.context = {
