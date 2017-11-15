@@ -1,7 +1,5 @@
-import {es6promise} from 'es6-promise';
-import 'isomorphic-fetch';
-
-es6promise.polyfill();
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
 
 const LCS_ENDPOINT =
 	'https://ec-dev.liferay.com:8095/api/analyticsgateway/send-analytics-events';

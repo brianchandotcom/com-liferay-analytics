@@ -1,5 +1,9 @@
 import schedule from 'schedule';
-import storage from 'metal-storage';
+import {
+	Storage,
+	StorageMechanism,
+	LocalStorageMechanism,
+} from 'metal-storage';
 import LCSClient from './LCSClient';
 
 // activate Middlewares
@@ -9,6 +13,9 @@ import './middlewares/meta';
 const DEFAULT_FLUSH_TIME = 2000;
 const REQUEST_TIMEOUT = 5000;
 const STORAGE_KEY = 'lcs_client_batch';
+
+// creates LocalStorage wrapper
+const storage = new Storage(new LocalStorageMechanism());
 
 /**
  * Serializes data and returns the result
@@ -120,6 +127,9 @@ class Analytics {
 		return this.config;
 	}
 }
+
+// expose it to the global scope
+(window || global).Analytics = Analytics;
 
 export {Analytics};
 export default Analytics;
