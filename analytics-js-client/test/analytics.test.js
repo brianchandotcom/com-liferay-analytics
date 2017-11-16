@@ -102,6 +102,7 @@ describe('Analytics API', () => {
 		return new Promise(resolve => {
 			setTimeout(() => {
 				assert(spy.calledOnce);
+				resolve();
 			}, AUTO_FLUSH_FREQUENCY * 1.25);
 		});
 	});

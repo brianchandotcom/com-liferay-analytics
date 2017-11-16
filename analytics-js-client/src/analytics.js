@@ -79,7 +79,7 @@ Analytics.prototype = {
 	 */
 	reset() {
 		this.events.splice(0, this.events.length);
-		persist();
+		this.persist();
 	},
 
 	/**
