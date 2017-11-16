@@ -10,6 +10,8 @@ import LCSClient from './LCSClient';
 import './middlewares/default';
 import './middlewares/meta';
 
+const ENV = window || global;
+
 const DEFAULT_FLUSH_TIME = 2000;
 const REQUEST_TIMEOUT = 5000;
 const STORAGE_KEY = 'lcs_client_batch';
@@ -45,21 +47,21 @@ function handleError(err) {
 	console.log(err);
 }
 
-class Analytics {
-	/**
-	 * Returns an Analytics instance and triggers the automatic flush loop
-	 * @param {object} configuration object to instantiate the Analytics tool
-	 */
-	constructor(config) {
-		this.config = config || {};
-		this.events = storage.get(STORAGE_KEY) || [];
+/**
+ * Returns an Analytics instance and triggers the automatic flush loop
+ * @param {object} configuration object to instantiate the Analytics tool
+ */
+function Analytics(config) {
+	const flushTime = config.autoFlushFrequency || DEFAULT_FLUSH_TIME;
 
-		// start automatic flush loop
-		this.timer = schedule
-			.every(`${DEFAULT_FLUSH_TIME}ms`)
-			.do(() => this.flush());
-	}
+	this.config = config || {};
+	this.events = storage.get(STORAGE_KEY) || [];
 
+	// start automatic flush loop
+	this.timer = schedule.every(`${flushTime}ms`).do(() => this.flush());
+}
+
+Analytics.prototype = {
 	/**
 	 * Registers an event that is to be sent to the LCS endpoint
 	 * @param {string} eventId - Id
@@ -70,7 +72,7 @@ class Analytics {
 		const data = serialize(eventId, applicationId, eventProps);
 		this.events.push(data);
 		this.persist();
-	}
+	},
 
 	/**
 	 * Resets the event queue
@@ -78,20 +80,23 @@ class Analytics {
 	reset() {
 		this.events.splice(0, this.events.length);
 		persist();
-	}
+	},
 
 	/**
 	 * Persists the event queue to the LocalStorage
 	 */
 	persist() {
 		storage.set(STORAGE_KEY, this.events);
-	}
+	},
 
 	/**
 	 * Sends the event queue to the LCS endpoint
 	 * @returns {object} Promise
 	 */
 	flush() {
+		// no flush when there is nothing to push
+		if (this.events.length === 0) return;
+
 		// race condition against finishing off before the timeout is triggered
 		return (
 			Promise.race([LCSClient.send(this), timeout(REQUEST_TIMEOUT)])
@@ -100,7 +105,7 @@ class Analytics {
 				// any type of error must be handled
 				.catch(handleError)
 		);
-	}
+	},
 
 	/**
 	 * Returns the determined LCS endpoint
@@ -108,7 +113,7 @@ class Analytics {
 	 */
 	getEndpointURL() {
 		return this.config.uri;
-	}
+	},
 
 	/**
 	 * Returns the event queue
@@ -117,7 +122,7 @@ class Analytics {
 
 	getEvents() {
 		return this.events;
-	}
+	},
 
 	/**
 	 * Returns the configuration object with which this instance was created
@@ -125,11 +130,37 @@ class Analytics {
 	 */
 	getConfig() {
 		return this.config;
+	},
+};
+
+// reference to the singleton Analytics instance
+let singleton;
+
+/**
+ * Creates a singleton instance of Analytics
+ * @param {object} config - configuration object to create a singleton instance of Analytics
+ * @return {object} singleton instance of Analytics
+ * @example
+ * 	Analytics.create({
+ *			analyticsKey: 'MyAnalyticsKey',
+ *			userId: 'id-s7uatimmxgo',
+ *			autoFlushFrequency: 2000,
+ *			uri: 'https://ec-dev.liferay.com:8095/api/analyticsgateway/send-analytics-events'
+ *	});
+ */
+function create(config = {}) {
+	if (!singleton) {
+		singleton = new Analytics(config);
+		singleton.create = create;
 	}
+	singleton.config = config;
+	ENV.Analytics = singleton;
 }
 
 // expose it to the global scope
-(window || global).Analytics = Analytics;
+ENV.Analytics = {
+	create,
+};
 
-export {Analytics};
-export default Analytics;
+export {create};
+export default create;
