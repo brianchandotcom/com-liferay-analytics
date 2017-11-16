@@ -23,7 +23,7 @@ function send(analytics) {
  * @return {object} Request
  */
 function getLCSRequest(analytics) {
-	const header = new Headers();
+	const headers = new Headers();
 	const body = JSON.stringify(getRequestBody(analytics));
 	return {
 		method: 'POST',
