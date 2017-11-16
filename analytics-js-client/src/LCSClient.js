@@ -25,6 +25,9 @@ function send(analytics) {
 function getLCSRequest(analytics) {
 	const headers = new Headers();
 	const body = JSON.stringify(getRequestBody(analytics));
+
+	headers.append('Content-Type', 'application/json');
+
 	return {
 		method: 'POST',
 		mode: 'cors',
