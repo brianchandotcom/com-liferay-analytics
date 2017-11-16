@@ -63,7 +63,7 @@ describe('Analytics API', () => {
 
 		const eventsNumber = 5;
 
-		for (let i = eventsNumber - 1; i > 0; i -= 1) {
+		for (let i = eventsNumber - 1; i >= 0; i -= 1) {
 			analytics.send(eventId, applicationId, properties);
 		}
 
@@ -71,16 +71,31 @@ describe('Analytics API', () => {
 		events.should.have.lengthOf(eventsNumber);
 	});
 
-	it('Analytics.flush() must send the trigger an HTTPRequest to be sent to the given LCS endpoint', () => {
+	it('Analytics.flush() must send an HTTP Request to given LCS endpoint', () => {
 		const analytics = new Analytics();
-		const eventId = 'eventId';
-		const applicationId = 'applicationId';
-		const properties = {a: 1, b: 2, c: 3};
-
 		const eventsNumber = 5;
 
 		for (let i = eventsNumber - 1; i > 0; i -= 1) {
+			const eventId = i;
+			const applicationId = 'test';
+			const properties = {a: 1, b: 2, c: 3};
 			analytics.send(eventId, applicationId, properties);
 		}
+
+		return analytics.flush();
+	});
+
+	it('Automatic flush must send an HTTP Request to given LCS endpoint at regular intervals', () => {
+		const analytics = new Analytics();
+		const eventsNumber = 5;
+
+		for (let i = eventsNumber - 1; i > 0; i -= 1) {
+			const eventId = i;
+			const applicationId = 'test';
+			const properties = {a: 1, b: 2, c: 3};
+			analytics.send(eventId, applicationId, properties);
+		}
+
+		return analytics.flush();
 	});
 });

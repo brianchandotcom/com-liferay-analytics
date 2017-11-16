@@ -8,7 +8,7 @@
     "format": "prettier-eslint --write src/**/*.js",
     "lint": "eslint src/**/*.js",
     "precommit": "lint-staged",
-    "test": "npm run build && karma start karma.js"
+    "test": "karma start karma.js"
   },
   "repository": {
     "type": "git",
@@ -31,11 +31,13 @@
     "chai": "^4.1.2",
     "eslint": "^4.11.0",
     "eslint-config-liferay": "^2.0.9",
+    "fetch-mock": "^5.13.1",
     "husky": "^0.14.3",
     "karma": "^1.7.1",
     "karma-babel-preprocessor": "^7.0.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.1",
     "karma-firefox-launcher": "^1.0.1",
     "karma-ie-launcher": "^1.0.0",
     "karma-ievms": "git+https://github.com/niksy/karma-ievms.git#browser-decorator",
