@@ -9,7 +9,7 @@ import LCSClient from '../LCSClient';
 function getQuery(query, attr) {
 	return function() {
 		const tag = document.querySelector(query) || {};
-		return tag[attr];
+		return tag[attr] || '';
 	};
 }
 
