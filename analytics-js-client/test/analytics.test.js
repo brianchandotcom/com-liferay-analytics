@@ -7,46 +7,41 @@ describe('Analytics API', () => {
 	beforeEach(() => localStorage.removeItem(STORAGE_KEY));
 
 	it('Analytics is exposed to the global scope', () => {
-		expect(Analytics).to.be.a('function');
+		expect(Analytics).to.be.a('object');
 	});
 
-	it('Analytics can be instantiated', () => {
-		const analytics = new Analytics();
-		analytics.should.be.a('object');
+	it('Analytics can be instantiated throught "create" function', () => {
+		Analytics.create.should.be.a('function');
 	});
 
 	it('Analytics instance must expose getConfig function', () => {
-		const analytics = new Analytics();
-		analytics.getConfig.should.be.a('function');
+		Analytics.create();
+		Analytics.getConfig.should.be.a('function');
 	});
 
 	it('Analytics.getConfig() must return the passed configuration object', () => {
-		const config = {
-			a: 1,
-			b: 2,
-			c: 3,
-		};
-		const analytics = new Analytics(config);
-		analytics.getConfig().should.deep.equal(config);
+		const config = {a: 1, b: 2, c: 3};
+		Analytics.create(config);
+		Analytics.getConfig().should.deep.equal(config);
 	});
 
 	it('Analytics instance must expose getEvents function', () => {
-		const analytics = new Analytics();
-		analytics.getEvents.should.be.a('function');
+		Analytics.create();
+		Analytics.getEvents.should.be.a('function');
 	});
 
 	it('Analytics instance must expose send function', () => {
-		const analytics = new Analytics();
-		analytics.send.should.be.a('function');
+		Analytics.create();
+		Analytics.send.should.be.a('function');
 	});
 
 	it('Analytics.send() must add the given event to the event queue', () => {
-		const analytics = new Analytics();
 		const eventId = 'eventId';
 		const applicationId = 'applicationId';
 		const properties = {a: 1, b: 2, c: 3};
-		analytics.send(eventId, applicationId, properties);
-		const events = analytics.getEvents();
+		Analytics.create();
+		Analytics.send(eventId, applicationId, properties);
+		const events = Analytics.getEvents();
 		events.should.have.lengthOf(1);
 		events.should.deep.include({
 			eventId,
@@ -56,46 +51,58 @@ describe('Analytics API', () => {
 	});
 
 	it('Analytics.send() must persist the given events to the LocalStorage', () => {
-		const analytics = new Analytics();
 		const eventId = 'eventId';
 		const applicationId = 'applicationId';
 		const properties = {a: 1, b: 2, c: 3};
 
 		const eventsNumber = 5;
 
+		Analytics.create();
+
 		for (let i = eventsNumber - 1; i >= 0; i -= 1) {
-			analytics.send(eventId, applicationId, properties);
+			Analytics.send(eventId, applicationId, properties);
 		}
 
 		const events = JSON.parse(localStorage.getItem(STORAGE_KEY));
-		events.should.have.lengthOf(eventsNumber);
+		events.should.have.lengthOf.at.least(eventsNumber);
 	});
 
 	it('Analytics.flush() must send an HTTP Request to given LCS endpoint', () => {
-		const analytics = new Analytics();
 		const eventsNumber = 5;
+
+		Analytics.create();
 
 		for (let i = eventsNumber - 1; i > 0; i -= 1) {
 			const eventId = i;
 			const applicationId = 'test';
 			const properties = {a: 1, b: 2, c: 3};
-			analytics.send(eventId, applicationId, properties);
+			Analytics.send(eventId, applicationId, properties);
 		}
 
-		return analytics.flush();
+		return Analytics.flush();
 	});
 
 	it('Automatic flush must send an HTTP Request to given LCS endpoint at regular intervals', () => {
-		const analytics = new Analytics();
+		const AUTO_FLUSH_FREQUENCY = 1000;
 		const eventsNumber = 5;
+
+		Analytics.create({
+			autoFlushFrequency: AUTO_FLUSH_FREQUENCY,
+		});
+
+		const spy = sinon.spy(Analytics, 'flush');
 
 		for (let i = eventsNumber - 1; i > 0; i -= 1) {
 			const eventId = i;
 			const applicationId = 'test';
 			const properties = {a: 1, b: 2, c: 3};
-			analytics.send(eventId, applicationId, properties);
+			Analytics.send(eventId, applicationId, properties);
 		}
 
-		return analytics.flush();
+		return new Promise(resolve => {
+			setTimeout(() => {
+				assert(spy.calledOnce);
+			}, AUTO_FLUSH_FREQUENCY * 1.25);
+		});
 	});
 });
