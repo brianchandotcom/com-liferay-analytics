@@ -153,6 +153,8 @@ function create(config = {}) {
 		singleton = new Analytics(config);
 		singleton.create = create;
 	}
+	// @TODO restart the timer if the Analytics.create is called more than one time
+	// with various auto flush frequency times
 	singleton.config = config;
 	ENV.Analytics = singleton;
 }

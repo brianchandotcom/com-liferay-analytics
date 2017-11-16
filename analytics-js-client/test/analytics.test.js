@@ -1,5 +1,6 @@
 const should = chai.should;
 const expect = chai.expect;
+const assert = chai.assert;
 const Analytics = window.Analytics;
 const STORAGE_KEY = 'lcs_client_batch';
 
@@ -67,8 +68,10 @@ describe('Analytics API', () => {
 		events.should.have.lengthOf.at.least(eventsNumber);
 	});
 
-	it('Analytics.flush() must send an HTTP Request to given LCS endpoint', () => {
+	it('Analytics.flush() must send an HTTP Request to given LCS endpoint', function() {
 		const eventsNumber = 5;
+
+		this.timeout(10000);
 
 		Analytics.create();
 
@@ -82,9 +85,11 @@ describe('Analytics API', () => {
 		return Analytics.flush();
 	});
 
-	it('Automatic flush must send an HTTP Request to given LCS endpoint at regular intervals', () => {
-		const AUTO_FLUSH_FREQUENCY = 1000;
+	it('Automatic flush must send an HTTP Request to given LCS endpoint at regular intervals', function() {
+		const AUTO_FLUSH_FREQUENCY = 2000;
 		const eventsNumber = 5;
+
+		this.timeout(10000);
 
 		Analytics.create({
 			autoFlushFrequency: AUTO_FLUSH_FREQUENCY,
@@ -101,7 +106,7 @@ describe('Analytics API', () => {
 
 		return new Promise(resolve => {
 			setTimeout(() => {
-				assert(spy.calledOnce);
+				assert.isTrue(spy.calledOnce);
 				resolve();
 			}, AUTO_FLUSH_FREQUENCY * 1.25);
 		});
