@@ -56,6 +56,7 @@ function Analytics(config) {
 
 	this.config = config || {};
 	this.events = storage.get(STORAGE_KEY) || [];
+	this.flushIsInProgress = false;
 
 	// start automatic flush loop
 	this.timer = schedule.every(`${flushTime}ms`).do(() => this.flush());
@@ -94,8 +95,15 @@ Analytics.prototype = {
 	 * @returns {object} Promise
 	 */
 	flush() {
+		// do not attempt to trigger multiple flush actions until the previous one
+		// is terminated
+		if (this.flushIsInProgress) return;
+
 		// no flush when there is nothing to push
 		if (this.events.length === 0) return;
+
+		// flag to avoid overlapping requests
+		this.flushIsInProgress = true;
 
 		// race condition against finishing off before the timeout is triggered
 		return (
@@ -104,6 +112,8 @@ Analytics.prototype = {
 				.then(() => this.reset())
 				// any type of error must be handled
 				.catch(handleError)
+				// regardless the outcome the flag needs invalidation
+				.then(() => (this.flushIsInProgress = false))
 		);
 	},
 
