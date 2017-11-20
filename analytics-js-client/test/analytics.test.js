@@ -2,7 +2,6 @@ const should = chai.should;
 const expect = chai.expect;
 const assert = chai.assert;
 const Analytics = window.Analytics;
-const testServer = window.echoServer;
 const STORAGE_KEY = 'lcs_client_batch';
 const fetchMock =  window.fetchMock;
 
