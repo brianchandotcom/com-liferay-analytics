@@ -18,6 +18,7 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +112,10 @@ public final class AnalyticsEventsMessage implements Serializable {
 			return _applicationId;
 		}
 
+		public Date getEventDate() {
+			return _eventDate;
+		}
+
 		public String getEventId() {
 			return _eventId;
 		}
@@ -140,6 +145,7 @@ public final class AnalyticsEventsMessage implements Serializable {
 			protected Builder(String applicationId, String eventId) {
 				_event._applicationId = applicationId;
 				_event._eventId = eventId;
+				_event._eventDate = new Date();
 			}
 
 			private final AnalyticsEventsMessage.Event _event =
@@ -151,6 +157,7 @@ public final class AnalyticsEventsMessage implements Serializable {
 		}
 
 		private String _applicationId;
+		private Date _eventDate;
 		private String _eventId;
 		private Map<String, String> _properties = new HashMap<>();
 
