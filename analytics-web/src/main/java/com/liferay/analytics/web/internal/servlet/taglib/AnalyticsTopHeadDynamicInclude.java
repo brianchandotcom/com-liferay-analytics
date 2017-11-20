@@ -47,7 +47,8 @@ public class AnalyticsTopHeadDynamicInclude extends BaseDynamicInclude {
 
 		_portal.setPageKeywords(
 			AssetUtil.getAssetKeywords(
-				Layout.class.getName(), themeDisplay.getPlid()), request);
+				Layout.class.getName(), themeDisplay.getPlid()),
+			request);
 	}
 
 	@Override
