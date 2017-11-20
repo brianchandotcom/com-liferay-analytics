@@ -121,7 +121,6 @@ describe('Analytics API', () => {
 			});
 		});
 
-		// creates the client that points to the echo server
 		Analytics.create({
 			autoFlushFrequency: AUTO_FLUSH_FREQUENCY
 		});
