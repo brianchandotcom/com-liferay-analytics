@@ -7,9 +7,9 @@
 	"globals": {
 		"Liferay": true
 	},
-	"parserOptions":{
+	"parserOptions": {
 		"ecmaFeatures": {
-		  "experimentalObjectRestSpread": true
+		 	"experimentalObjectRestSpread": true
 		}
-  }
+  	}
 }

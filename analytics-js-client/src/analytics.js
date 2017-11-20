@@ -48,21 +48,27 @@ function handleError(err) {
 }
 
 /**
- * Returns an Analytics instance and triggers the automatic flush loop
- * @param {object} configuration object to instantiate the Analytics tool
+ * Analytics class that is desined to collect events that are captured
+ * for later processing. It persists the events in the LocalStorage using the
+ * metal-storage implementation and flushes it to the defined endpoint at
+ * regular intervals.
  */
-function Analytics(config) {
-	const flushTime = config.autoFlushFrequency || DEFAULT_FLUSH_TIME;
+class Analytics {
+	/**
+	 * Returns an Analytics instance and triggers the automatic flush loop
+	 * @param {object} configuration object to instantiate the Analytics tool
+	 */
+	constructor(config) {
+		const flushTime = config.autoFlushFrequency || DEFAULT_FLUSH_TIME;
 
-	this.config = config || {};
-	this.events = storage.get(STORAGE_KEY) || [];
-	this.flushIsInProgress = false;
+		this.config = config || {};
+		this.events = storage.get(STORAGE_KEY) || [];
+		this.flushIsInProgress = false;
 
-	// start automatic flush loop
-	this.timer = schedule.every(`${flushTime}ms`).do(() => this.flush());
-}
+		// start automatic flush loop
+		this.timer = schedule.every(`${flushTime}ms`).do(() => this.flush());
+	}
 
-Analytics.prototype = {
 	/**
 	 * Registers an event that is to be sent to the LCS endpoint
 	 * @param {string} eventId - Id
@@ -73,7 +79,7 @@ Analytics.prototype = {
 		const data = serialize(eventId, applicationId, eventProps);
 		this.events.push(data);
 		this.persist();
-	},
+	}
 
 	/**
 	 * Resets the event queue
@@ -81,14 +87,14 @@ Analytics.prototype = {
 	reset() {
 		this.events.splice(0, this.events.length);
 		this.persist();
-	},
+	}
 
 	/**
 	 * Persists the event queue to the LocalStorage
 	 */
 	persist() {
 		storage.set(STORAGE_KEY, this.events);
-	},
+	}
 
 	/**
 	 * Sends the event queue to the LCS endpoint
@@ -115,7 +121,7 @@ Analytics.prototype = {
 				// regardless the outcome the flag needs invalidation
 				.then(() => (this.flushIsInProgress = false))
 		);
-	},
+	}
 
 	/**
 	 * Returns the determined LCS endpoint
@@ -123,7 +129,7 @@ Analytics.prototype = {
 	 */
 	getEndpointURL() {
 		return this.config.uri;
-	},
+	}
 
 	/**
 	 * Returns the event queue
@@ -132,7 +138,7 @@ Analytics.prototype = {
 
 	getEvents() {
 		return this.events;
-	},
+	}
 
 	/**
 	 * Returns the configuration object with which this instance was created
@@ -140,7 +146,8 @@ Analytics.prototype = {
 	 */
 	getConfig() {
 		return this.config;
-	},
+	}
+
 };
 
 // reference to the singleton Analytics instance

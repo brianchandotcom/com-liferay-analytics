@@ -11,7 +11,11 @@ module.exports = function(config) {
 		frameworks: ['mocha', 'chai', 'sinon'],
 
 		// list of files / patterns to load in the browser
-		files: ['build/analytics-all-min.js', 'test/**/*.test.js'],
+		files: [
+			'build/analytics-all-min.js', 
+			'node_modules/fetch-mock/es5/client-browserified.js',
+			'test/**/*.test.js'
+		],
 
 		// list of files to exclude
 		exclude: [],
@@ -19,7 +23,7 @@ module.exports = function(config) {
 		// preprocess matching files before serving them to the browser
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 		preprocessors: {
-			'test/**/*.js': ['babel'],
+			'test/**/*.js': ['babel']
 		},
 
 		// babel preprocessor
@@ -50,7 +54,7 @@ module.exports = function(config) {
 
 		// start these browsers
 		// available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-		browsers: ['Chrome', 'Firefox', 'Safari', 'IE11 - Win7', 'MSEdge - Win10'],
+		browsers: ['Firefox'],
 
 		// Continuous Integration mode
 		// if true, Karma captures browsers, runs the tests and exits

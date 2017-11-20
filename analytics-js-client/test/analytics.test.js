@@ -2,7 +2,18 @@ const should = chai.should;
 const expect = chai.expect;
 const assert = chai.assert;
 const Analytics = window.Analytics;
+const testServer = window.echoServer;
 const STORAGE_KEY = 'lcs_client_batch';
+const fetchMock =  window.fetchMock;
+
+function sendDummyEvents(eventsNumber = 5) {
+	for (let i = eventsNumber - 1; i > 0; i -= 1) {
+		const eventId = i;
+		const applicationId = 'test';
+		const properties = {a: 1, b: 2, c: 3};
+		Analytics.send(eventId, applicationId, properties);
+	};			
+}
 
 describe('Analytics API', () => {
 	beforeEach(() => localStorage.removeItem(STORAGE_KEY));
@@ -60,34 +71,23 @@ describe('Analytics API', () => {
 
 		Analytics.create();
 
-		for (let i = eventsNumber - 1; i >= 0; i -= 1) {
-			Analytics.send(eventId, applicationId, properties);
-		}
+		sendDummyEvents(eventsNumber);
 
 		const events = JSON.parse(localStorage.getItem(STORAGE_KEY));
 		events.should.have.lengthOf.at.least(eventsNumber);
 	});
 
 	it('Analytics.flush() must send an HTTP Request to given LCS endpoint', function() {
-		const eventsNumber = 5;
-
 		this.timeout(10000);
 
 		Analytics.create();
-
-		for (let i = eventsNumber - 1; i > 0; i -= 1) {
-			const eventId = i;
-			const applicationId = 'test';
-			const properties = {a: 1, b: 2, c: 3};
-			Analytics.send(eventId, applicationId, properties);
-		}
+		sendDummyEvents();
 
 		return Analytics.flush();
 	});
 
 	it('Automatic flush must send an HTTP Request to given LCS endpoint at regular intervals', function() {
 		const AUTO_FLUSH_FREQUENCY = 2000;
-		const eventsNumber = 5;
 
 		this.timeout(10000);
 
@@ -97,18 +97,60 @@ describe('Analytics API', () => {
 
 		const spy = sinon.spy(Analytics, 'flush');
 
-		for (let i = eventsNumber - 1; i > 0; i -= 1) {
-			const eventId = i;
-			const applicationId = 'test';
-			const properties = {a: 1, b: 2, c: 3};
-			Analytics.send(eventId, applicationId, properties);
-		}
+		sendDummyEvents();
 
 		return new Promise(resolve => {
 			setTimeout(() => {
 				assert.isTrue(spy.calledOnce);
+				Analytics.flush.restore();
 				resolve();
 			}, AUTO_FLUSH_FREQUENCY * 1.25);
 		});
 	});
+
+	it('No overlapping requests are allowed', function() {
+		// every 2s we autoflush the storage
+		const AUTO_FLUSH_FREQUENCY = 2000;
+		let fetchCalled = 0;
+
+		this.timeout(30000);
+
+		fetchMock.mock('*', function() {
+			fetchCalled += 1;
+			return new Promise(resolve => {
+				setTimeout(resolve, 10000);
+			});
+		});
+
+		// creates the client that points to the echo server
+		Analytics.create({
+			autoFlushFrequency: AUTO_FLUSH_FREQUENCY
+		});
+
+		// generates few events
+		sendDummyEvents();
+
+		// spies against Analytics.flush function
+		const spy = sinon.spy(Analytics, 'flush');
+
+		return new Promise(resolve => {
+			// it waits 3 loop cycle to make sure there is no further
+			// attempts to flush the storage since the first request has not yet
+			// been processed
+			setTimeout(() => {
+
+				// flush must be called 3 times
+				assert.isTrue(spy.calledThrice);
+
+				// but without sending another Fetch Request
+				expect(fetchCalled).to.equal(1);
+
+				// tears down the test gracefully
+				Analytics.flush.restore();
+				resolve();
+
+			}, AUTO_FLUSH_FREQUENCY * 3);
+		});
+	});
+
 });
