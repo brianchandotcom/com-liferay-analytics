@@ -1,0 +1,15 @@
+{
+	"env": {
+		"browser": true,
+		"jest": true
+	},
+	"extends": "liferay",
+	"globals": {
+		"Liferay": true
+	},
+	"parserOptions": {
+		"ecmaFeatures": {
+		 	"experimentalObjectRestSpread": true
+		}
+  	}
+}
