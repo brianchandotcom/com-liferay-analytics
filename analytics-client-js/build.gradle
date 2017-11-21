@@ -1,0 +1,12 @@
+plugins {
+	id "com.eriwen.gradle.js" version "2.14.1"
+}
+
+def distDir = "${buildDir}"
+
+task wedeploy(type: Exec) {
+	workingDir distDir
+	commandLine "we", "deploy", "-p", "liferayanalytics"
+}
+
+wedeploy.dependsOn npmRunBuild
