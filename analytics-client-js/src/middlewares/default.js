@@ -22,5 +22,4 @@ function defaultMiddleware(req, analytics) {
 	};
 }
 
-// registers the middleware
 LCSClient.use(defaultMiddleware);

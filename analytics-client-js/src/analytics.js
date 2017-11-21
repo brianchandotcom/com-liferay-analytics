@@ -6,7 +6,6 @@ import {
 } from 'metal-storage';
 import LCSClient from './LCSClient';
 
-// activate Middlewares
 import './middlewares/default';
 import './middlewares/meta';
 
@@ -16,7 +15,6 @@ const DEFAULT_FLUSH_TIME = 2000;
 const REQUEST_TIMEOUT = 5000;
 const STORAGE_KEY = 'lcs_client_batch';
 
-// creates LocalStorage wrapper
 const storage = new Storage(new LocalStorageMechanism());
 
 /**
@@ -65,7 +63,6 @@ class Analytics {
 		this.events = storage.get(STORAGE_KEY) || [];
 		this.flushIsInProgress = false;
 
-		// start automatic flush loop
 		this.timer = schedule.every(`${flushTime}ms`).do(() => this.flush());
 	}
 
@@ -101,24 +98,16 @@ class Analytics {
 	 * @returns {object} Promise
 	 */
 	flush() {
-		// do not attempt to trigger multiple flush actions until the previous one
-		// is terminated
 		if (this.flushIsInProgress) return;
 
-		// no flush when there is nothing to push
 		if (this.events.length === 0) return;
 
-		// flag to avoid overlapping requests
 		this.flushIsInProgress = true;
 
-		// race condition against finishing off before the timeout is triggered
 		return (
 			Promise.race([LCSClient.send(this), timeout(REQUEST_TIMEOUT)])
-				// resets our storage if sending the events went down well
 				.then(() => this.reset())
-				// any type of error must be handled
 				.catch(handleError)
-				// regardless the outcome the flag needs invalidation
 				.then(() => (this.flushIsInProgress = false))
 		);
 	}
@@ -150,7 +139,6 @@ class Analytics {
 
 };
 
-// reference to the singleton Analytics instance
 let singleton;
 
 /**
@@ -170,13 +158,14 @@ function create(config = {}) {
 		singleton = new Analytics(config);
 		singleton.create = create;
 	}
-	// @TODO restart the timer if the Analytics.create is called more than one time
+
+	// @TODO Restart the timer if the Analytics.create is called more than one time
 	// with various auto flush frequency times
+	
 	singleton.config = config;
 	ENV.Analytics = singleton;
 }
 
-// expose it to the global scope
 ENV.Analytics = {
 	create,
 };
