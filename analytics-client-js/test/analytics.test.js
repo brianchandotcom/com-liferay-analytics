@@ -108,7 +108,7 @@ describe('Analytics API', () => {
 	});
 
 	it('No overlapping requests are allowed', function() {
-		// every 2s we autoflush the storage
+
 		const AUTO_FLUSH_FREQUENCY = 2000;
 		let fetchCalled = 0;
 
@@ -125,25 +125,26 @@ describe('Analytics API', () => {
 			autoFlushFrequency: AUTO_FLUSH_FREQUENCY
 		});
 
-		// generates few events
 		sendDummyEvents();
 
-		// spies against Analytics.flush function
 		const spy = sinon.spy(Analytics, 'flush');
 
 		return new Promise(resolve => {
-			// it waits 3 loop cycle to make sure there is no further
+			
+			// It waits 3 loop cycle to make sure there is no further
 			// attempts to flush the storage since the first request has not yet
 			// been processed
+			
 			setTimeout(() => {
 
-				// flush must be called 3 times
+				// Flush must be called 3 times
+
 				assert.isTrue(spy.calledThrice);
 
-				// but without sending another Fetch Request
+				// Without sending another Fetch Request
+
 				expect(fetchCalled).to.equal(1);
 
-				// tears down the test gracefully
 				Analytics.flush.restore();
 				resolve();
 
