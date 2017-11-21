@@ -12,7 +12,7 @@ module.exports = function(config) {
 
 		// list of files / patterns to load in the browser
 		files: [
-			'build/analytics-all-min.js', 
+			'build/analytics-all-min.js',
 			'node_modules/fetch-mock/es5/client-browserified.js',
 			'test/**/*.test.js'
 		],

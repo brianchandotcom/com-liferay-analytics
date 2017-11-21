@@ -11,7 +11,7 @@ function sendDummyEvents(eventsNumber = 5) {
 		const applicationId = 'test';
 		const properties = {a: 1, b: 2, c: 3};
 		Analytics.send(eventId, applicationId, properties);
-	};			
+	};
 }
 
 describe('Analytics API', () => {
