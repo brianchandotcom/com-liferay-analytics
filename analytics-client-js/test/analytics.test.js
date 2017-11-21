@@ -130,11 +130,11 @@ describe('Analytics API', () => {
 		const spy = sinon.spy(Analytics, 'flush');
 
 		return new Promise(resolve => {
-			
+
 			// It waits 3 loop cycle to make sure there is no further
 			// attempts to flush the storage since the first request has not yet
 			// been processed
-			
+
 			setTimeout(() => {
 
 				// Flush must be called 3 times
