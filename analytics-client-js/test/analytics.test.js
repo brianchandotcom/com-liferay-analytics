@@ -141,11 +141,12 @@ describe('Analytics API', () => {
 
 				assert.isTrue(spy.calledThrice);
 
-				// Without sending another Fetch Request
+				// Without sending another fetch request
 
 				expect(fetchCalled).to.equal(1);
 
 				Analytics.flush.restore();
+
 				resolve();
 
 			}, AUTO_FLUSH_FREQUENCY * 3);
