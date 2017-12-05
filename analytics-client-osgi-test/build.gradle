@@ -7,3 +7,5 @@ dependencies {
 	testIntegrationCompile group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "2.0.0"
 	testIntegrationCompile project(":apps:analytics:analytics-api")
 }
+
+test.enabled = false

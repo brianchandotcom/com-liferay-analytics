@@ -100,7 +100,7 @@ public final class AnalyticsEventsMessage implements Serializable {
 
 	}
 
-	public static final class Event {
+	public static final class Event implements Serializable {
 
 		public static Event.Builder builder(
 			String applicationId, String eventId) {
@@ -113,7 +113,7 @@ public final class AnalyticsEventsMessage implements Serializable {
 		}
 
 		public Date getEventDate() {
-			return _eventDate;
+			return new Date(_eventDate.getTime());
 		}
 
 		public String getEventId() {

@@ -101,7 +101,7 @@ public class AnalyticsEventsMessageJSONObjectMapperTest {
 
 		expectedJSONString = expectedJSONString.replace(
 			"2017-11-20T19:52:56.723Z",
-			ISO8601Utils.format(event.getEventDate(), false));
+			ISO8601Utils.format(event.getEventDate(), true));
 
 		String actualJSONString = _jsonObjectMapper.map(messageBuilder.build());
 
@@ -115,7 +115,7 @@ public class AnalyticsEventsMessageJSONObjectMapperTest {
 
 		byte[] bytes = Files.readAllBytes(Paths.get(url.toURI()));
 
-		return new String(bytes);
+		return new String(bytes, "UTF-8");
 	}
 
 	private final JSONObjectMapper<AnalyticsEventsMessage> _jsonObjectMapper =
