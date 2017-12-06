@@ -4,3 +4,13 @@ language: java
 
 script:
     - ./gradlew test
+
+deploy:
+    provider: s3
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_ACCESS_SECRET_KEY
+    bucket: $AWS_S3_BUCKET_NAME
+    skip_cleanup: true
+    local_dir: analytics-client-js/build
+    on:
+        branch: release
