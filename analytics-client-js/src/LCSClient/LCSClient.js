@@ -22,11 +22,12 @@ class LCSClient {
 	 * Returns a Request object with all data from the analytics instance
 	 * includin the batched event objects
 	 * @param {object} analytics The Analytics instance from which the data is extracted
+	 * @param {string} userId The userId string representation
 	 * @protected
 	 * @return {object} Request
 	 */
-	_getLCSRequest(analytics) {
-		const body = JSON.stringify(this._getRequestBody(analytics));
+	_getLCSRequest(analytics, userId) {
+		const body = JSON.stringify(this._getRequestBody(analytics, userId));
 		const headers = new Headers();
 
 		headers.append('Content-Type', 'application/json');
@@ -45,11 +46,18 @@ class LCSClient {
 	 * Returns the formatted version of the analytics data that complies to the
 	 * predefined request specification of the LCS endpoint
 	 * @param {object} analytics The Analytics instance from which the data is extracted
+	 * @param {string} userId The userId string representation
 	 * @protected
 	 * @return {object} Body of the request to be sent to LCS
 	 */
-	_getRequestBody(analytics) {
-		const requestBody = {};
+	_getRequestBody(analytics, userId) {
+		const requestBody = {
+			analyticsKey: analytics.config.analyticsKey,
+			context: {},
+			events: analytics.events,
+			protocolVersion: '1.0',
+			userId,
+		};
 
 		return middlewares.reduce(
 			(request, middleware) => middleware(request, analytics),
@@ -76,10 +84,11 @@ class LCSClient {
 	/**
 	 * Returns a resolved or rejected promise as per the response status
 	 * @param {object} analytics The Analytics instance from which the data is extracted
+	 * @param {string} userId The userId string representation
 	 * @return {object} Promise object representing the result of the operation
 	 */
-	send(analytics) {
-		const request = this._getLCSRequest(analytics);
+	send(analytics, userId) {
+		const request = this._getLCSRequest(analytics, userId);
 
 		return fetch(this.uri, request).then(this._validateResponse);
 	}
