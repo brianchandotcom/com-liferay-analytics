@@ -334,4 +334,41 @@ describe('Analytics API', () => {
 				}
 			);
 	});
+
+	it.only('Analytics.send should always send at least the default payload', (done) => {
+		let body = null;
+
+		fetchMock.mock(
+			'*',
+			function(url, opts) {
+				body = JSON.parse(opts.body);
+
+				return 200;
+			}
+		);
+
+		Analytics.create(
+			{
+				analyticsKey: ANALYTICS_KEY
+			}
+		);
+
+		sendDummyEvents();
+
+		Analytics.flush()
+			.then(
+				() => {
+					expect(body).not.to.be.null;
+
+					expect(body.analyticsKey).to.equal(ANALYTICS_KEY);
+					expect(body.context).not.to.be.null;
+					expect(body.context.referrer).to.be.a('string');
+					expect(body.events).not.to.be.null;
+					expect(body.protocolVersion).to.be.a('string');
+					expect(body.userId).to.be.a('string');
+
+					done();
+				}
+			);
+	});
 });

@@ -79,8 +79,27 @@ Paste this code inside the HTML head:
 ,m=l.getElementsByTagName(o)[0],a.async=1,a.src=u,a.onload=c,
 m.parentNode.insertBefore(a,m)})('https://s3-eu-west-1.amazonaws.com/com-liferay-analytics/analytics-all-min.js', function(){
 
-    Analytics.create({ analyticsKey: 'MyAnalyticsKey', userId: 'id-test-js-client' });
-    Analytics.send('view', 'Layout', { message: 'This is a test'});
+    Analytics.create({ analyticsKey: 'MyAnalyticsKey' });
+    Analytics.send('view', 'Layout');
 });
 </script>
 ```
+
+The identity of the user generating the events will be automatically determined by the Analytics Client and the Identify Service.
+However, you can manually provide its identity by calling the `setIdentity` method of the Analytics object:
+
+```html
+    Analytics.create({ analyticsKey: 'MyAnalyticsKey' });
+    Analytics.setIdentity({ email: 'foo@bar.com', name: 'Foo' });
+```
+
+You can track custom events by invoking the `send` method of the Analytics object. For example: 
+
+```html
+    element.addEventListener('click', function(evt) {
+        Analytics.send('share', 'Blogs', { socialNetwork: 'twitter'});
+    });
+```
+
+The first argument of the `send` method identifies the event (e.g. `share`) and the second identifies the application associated to it (e.g. `Blogs`). 
+Through the third optional argument you can pass some extra information.
