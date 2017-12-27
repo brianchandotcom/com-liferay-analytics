@@ -1,6 +1,6 @@
 # Analytics Clients
 
-## Java Client
+## Generic Java Client
 
 Dependencies:
 
@@ -60,7 +60,7 @@ public void sendAnalytics(String analyticsKey) throws Exception {
 }
 ```
 
-## OSGi Client
+## Liferay OSGi Client
 
 Dependencies:
 
@@ -96,8 +96,11 @@ private static AnalyticsClient _analyticsClient;
 ```
 
 The `analyticsKey` is an identifier associated to your Liferay account.
-When no `userId` is passed in the message, the analytics client internally resolves the user's identity through the identity service with the default Liferay User Context.
-You can obtain the `userId` with a custom user context by explicitly invoking the identity client service:
+If the `userId` is not passed in the message, the analytics client will internally resolve the user's identity through the identity service with the default Liferay user context.
+In this case, if you want the guest user and the authenticated user to have the same `userId` after login and the Portal property `session.enable.phishing.protection` is set to `true` (default),
+then you need to include the `ANALYTICS_USER_ID` value in the `session.phishing.protected.attributes` Portal property.
+
+Alternatively, you can obtain the `userId` with a custom user context by explicitly invoking the identity client service:
 
 ```java
 public void sendAnalytics(String analyticsKey) throws Exception {
