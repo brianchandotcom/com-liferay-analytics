@@ -16,42 +16,48 @@ package com.liferay.analytics.client.osgi.demo.internal;
 
 import com.liferay.analytics.client.AnalyticsClient;
 import com.liferay.analytics.model.AnalyticsEventsMessage;
-import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
-import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
-import com.liferay.users.admin.demo.data.creator.BasicUserDemoDataCreator;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+
+import java.io.IOException;
+
+import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Eduardo Garcia
+ * @author Liferay
  */
-@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
-public class AnalyticsClientDemo extends BasePortalInstanceLifecycleListener {
+@Component(
+	immediate = true,
+	property = {
+		"com.liferay.portlet.display-category=category.sample",
+		"com.liferay.portlet.instanceable=true",
+		"javax.portlet.display-name=Analytics Client Demo Portlet",
+		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.security-role-ref=power-user,user"
+	},
+	service = Portlet.class
+)
+public class AnalyticsClientDemoPortlet extends MVCPortlet {
 
 	@Override
-	public void portalInstanceRegistered(Company company) throws Exception {
-		User user = _basicUserDemoDataCreator.create(
-			company.getCompanyId(), "joe.bloggs@liferay.com");
-
-		String name = PrincipalThreadLocal.getName();
+	public void doView(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
 
 		try {
-			PrincipalThreadLocal.setName(user.getUserId());
-
 			AnalyticsEventsMessage.Builder analyticsEventsMessageBuilder =
 				AnalyticsEventsMessage.builder("AnalyticsDemo");
 
 			AnalyticsEventsMessage.Event.Builder eventBuilder =
 				AnalyticsEventsMessage.Event.builder(
-					"com.analytics.client.osgi.demo", "start");
+					"com.analytics.client.osgi.demo", "view");
 
 			analyticsEventsMessageBuilder.event(eventBuilder.build());
 
@@ -63,14 +69,6 @@ public class AnalyticsClientDemo extends BasePortalInstanceLifecycleListener {
 		catch (Exception e) {
 			_log.error("Error sending analytics", e);
 		}
-		finally {
-			PrincipalThreadLocal.setName(name);
-		}
-	}
-
-	@Deactivate
-	protected void deactivate() throws PortalException {
-		_basicUserDemoDataCreator.delete();
 	}
 
 	@Reference(unbind = "-")
@@ -78,17 +76,9 @@ public class AnalyticsClientDemo extends BasePortalInstanceLifecycleListener {
 		_analyticsClient = analyticsClient;
 	}
 
-	@Reference(unbind = "-")
-	protected void setBasicUserDemoDataCreator(
-		BasicUserDemoDataCreator basicUserDemoDataCreator) {
-
-		_basicUserDemoDataCreator = basicUserDemoDataCreator;
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
-		AnalyticsClientDemo.class);
+		AnalyticsClientDemoPortlet.class);
 
 	private AnalyticsClient _analyticsClient;
-	private BasicUserDemoDataCreator _basicUserDemoDataCreator;
 
 }
