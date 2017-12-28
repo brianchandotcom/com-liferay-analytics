@@ -17,7 +17,9 @@ package com.liferay.analytics.client.osgi.test;
 import com.liferay.analytics.client.AnalyticsClient;
 import com.liferay.analytics.model.AnalyticsEventsMessage;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -42,26 +44,36 @@ public class AnalyticsClientTest {
 
 	@Test
 	public void testSendAnalytics() throws Exception {
-		AnalyticsEventsMessage.Builder analyticsEventsMessageBuilder =
-			AnalyticsEventsMessage.builder("ApplicationKey", "UserId");
+		String name = PrincipalThreadLocal.getName();
 
-		analyticsEventsMessageBuilder.contextProperty("languageId", "en_US");
-		analyticsEventsMessageBuilder.contextProperty(
-			"url", "http://www.liferay.com");
+		try {
+			PrincipalThreadLocal.setName(TestPropsValues.getUserId());
 
-		AnalyticsEventsMessage.Event.Builder eventBuilder =
-			AnalyticsEventsMessage.Event.builder("ApplicationId", "View");
+			AnalyticsEventsMessage.Builder analyticsEventsMessageBuilder =
+				AnalyticsEventsMessage.builder("ApplicationKey");
 
-		eventBuilder.property("elementId", "banner1");
+			analyticsEventsMessageBuilder.contextProperty(
+				"languageId", "en_US");
+			analyticsEventsMessageBuilder.contextProperty(
+				"url", "http://www.liferay.com");
 
-		analyticsEventsMessageBuilder.event(eventBuilder.build());
+			AnalyticsEventsMessage.Event.Builder eventBuilder =
+				AnalyticsEventsMessage.Event.builder("ApplicationId", "View");
 
-		analyticsEventsMessageBuilder.protocolVersion("1.0");
+			eventBuilder.property("elementId", "banner1");
 
-		Object response = _analyticsClient.sendAnalytics(
-			analyticsEventsMessageBuilder.build());
+			analyticsEventsMessageBuilder.event(eventBuilder.build());
 
-		Assert.assertNull(response);
+			analyticsEventsMessageBuilder.protocolVersion("1.0");
+
+			Object response = _analyticsClient.sendAnalytics(
+				analyticsEventsMessageBuilder.build());
+
+			Assert.assertNull(response);
+		}
+		finally {
+			PrincipalThreadLocal.setName(name);
+		}
 	}
 
 	@Inject

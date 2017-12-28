@@ -30,6 +30,16 @@ import java.util.Map;
 public final class AnalyticsEventsMessage implements Serializable {
 
 	public static AnalyticsEventsMessage.Builder builder(
+		AnalyticsEventsMessage analyticsEventsMessage) {
+
+		return new AnalyticsEventsMessage.Builder(analyticsEventsMessage);
+	}
+
+	public static AnalyticsEventsMessage.Builder builder(String analyticsKey) {
+		return new AnalyticsEventsMessage.Builder(analyticsKey);
+	}
+
+	public static AnalyticsEventsMessage.Builder builder(
 		String analyticsKey, String userId) {
 
 		return new AnalyticsEventsMessage.Builder(analyticsKey, userId);
@@ -88,6 +98,33 @@ public final class AnalyticsEventsMessage implements Serializable {
 			_analyticsEventsMessage._protocolVersion = protocolVersion;
 
 			return this;
+		}
+
+		public Builder userId(String userId) {
+			_analyticsEventsMessage._userId = userId;
+
+			return this;
+		}
+
+		protected Builder(AnalyticsEventsMessage analyticsEventsMessage) {
+			_analyticsEventsMessage._analyticsKey =
+				analyticsEventsMessage.getAnalyticsKey();
+
+			_analyticsEventsMessage._context =
+				analyticsEventsMessage.getContext();
+
+			_analyticsEventsMessage._events =
+				analyticsEventsMessage.getEvents();
+
+			_analyticsEventsMessage._protocolVersion =
+				analyticsEventsMessage.getProtocolVersion();
+
+			_analyticsEventsMessage._userId =
+				analyticsEventsMessage.getUserId();
+		}
+
+		protected Builder(String analyticsKey) {
+			_analyticsEventsMessage._analyticsKey = analyticsKey;
 		}
 
 		protected Builder(String analyticsKey, String userId) {

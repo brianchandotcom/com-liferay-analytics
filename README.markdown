@@ -1,6 +1,6 @@
 # Analytics Clients
 
-## Java Client
+## Generic Java Client
 
 Dependencies:
 
@@ -13,9 +13,8 @@ provided group: "com.liferay", name: "com.liferay.analytics.data.binding.impl", 
 Usage example:
 
 ```java
-public void sendAnalytics(String applicationKey, String userId) throws Exception {
-    AnalyticsEventsMessage.Builder analyticsEventsMessageBuilder =
-        AnalyticsEventsMessage.builder(applicationKey, userId);
+public void sendAnalytics(String analyticsKey, String userId) throws Exception {
+    AnalyticsEventsMessage.Builder analyticsEventsMessageBuilder = AnalyticsEventsMessage.builder(analyticsKey, userId);
 
     analyticsEventsMessageBuilder.contextProperty("languageId", "en_US");
     analyticsEventsMessageBuilder.contextProperty("url", "http://www.liferay.com");
@@ -28,13 +27,40 @@ public void sendAnalytics(String applicationKey, String userId) throws Exception
 
     analyticsEventsMessageBuilder.protocolVersion("1.0");
 
-    AnalyticsClientImpl _analyticsClientImpl = new AnalyticsClientImpl()
+    AnalyticsClientImpl analyticsClientImpl = new AnalyticsClientImpl()
 
-    _analyticsClientImpl.sendAnalytics(analyticsEventsMessageBuilder.build());
+    analyticsClientImpl.sendAnalytics(analyticsEventsMessageBuilder.build());
 }
 ```
 
-## OSGi Client
+The `analyticsKey` is an identifier associated to your Liferay account.
+The `userId` is a unique identifier of the user generating the event. You can use the identity service to retrieve a `userId` based on some user context information:
+
+```java
+public void sendAnalytics(String analyticsKey) throws Exception {
+    IdentityContextMessage.Builder identityContextMessageBuilder =
+        IdentityContextMessage.builder(analyticsKey);
+
+    identityContextMessageBuilder.dataSourceIdentifier("Liferay");
+    identityContextMessageBuilder.dataSourceIndividualIdentifier("12345");
+    identityContextMessageBuilder.domain("liferay.com");
+    identityContextMessageBuilder.language("en-US");
+    identityContextMessageBuilder.protocolVersion("1.0");
+
+    identityContextMessageBuilder.identityFieldsProperty("email", "joe.blogss@liferay.com");
+    identityContextMessageBuilder.identityFieldsProperty( "name", "Joe Bloggs");
+
+    IdentityClientImpl identityClientImpl = new IdentityClientImpl();
+
+    String userId = identityClientImpl.getUUID(identityContextMessageBuilder.build());
+
+    AnalyticsEventsMessage.Builder analyticsEventsMessageBuilder = AnalyticsEventsMessage.builder(analyticsKey, userId);
+
+    ...
+}
+```
+
+## Liferay OSGi Client
 
 Dependencies:
 
@@ -47,9 +73,9 @@ provided group: "com.liferay", name: "com.liferay.analytics.data.binding.impl", 
 Usage example:
 
 ```java
-public void sendAnalytics(String applicationKey, String userId) throws Exception {
+public void sendAnalytics(String analyticsKey) throws Exception {
     AnalyticsEventsMessage.Builder analyticsEventsMessageBuilder =
-        AnalyticsEventsMessage.builder(applicationKey, userId);
+        AnalyticsEventsMessage.builder(analyticsKey);
 
     analyticsEventsMessageBuilder.contextProperty("languageId", "en_US");
     analyticsEventsMessageBuilder.contextProperty("url", "http://www.liferay.com");
@@ -69,6 +95,41 @@ public void sendAnalytics(String applicationKey, String userId) throws Exception
 private static AnalyticsClient _analyticsClient;
 ```
 
+The `analyticsKey` is an identifier associated to your Liferay account.
+If the `userId` is not passed in the message, the analytics client will internally resolve the user's identity through the identity service with the default Liferay user context.
+In this case, if you want the guest user and the authenticated user to have the same `userId` after login and the Portal property `session.enable.phishing.protection` is set to `true` (default),
+then you need to include the `ANALYTICS_USER_ID` value in the `session.phishing.protected.attributes` Portal property.
+
+Alternatively, you can obtain the `userId` with a custom user context by explicitly invoking the identity client service:
+
+```java
+public void sendAnalytics(String analyticsKey) throws Exception {
+    IdentityContextMessage.Builder identityContextMessageBuilder =
+        IdentityContextMessage.builder(analyticsKey);
+
+    identityContextMessageBuilder.dataSourceIdentifier("Liferay");
+    identityContextMessageBuilder.dataSourceIndividualIdentifier("12345");
+    identityContextMessageBuilder.domain("liferay.com");
+    identityContextMessageBuilder.language("en-US");
+    identityContextMessageBuilder.protocolVersion("1.0");
+
+    identityContextMessageBuilder.identityFieldsProperty("email", "joe.blogss@liferay.com");
+    identityContextMessageBuilder.identityFieldsProperty( "name", "Joe Bloggs");
+
+    String userId = _identityClient.getUUID(identityContextMessageBuilder.build());
+
+    AnalyticsEventsMessage.Builder analyticsEventsMessageBuilder = AnalyticsEventsMessage.builder(analyticsKey, userId);
+
+    ...
+}
+
+@Reference
+private static AnalyticsClient _analyticsClient;
+
+@Reference
+private static IdentityClient _identityClient;
+```
+
 ## JS Client
 
 Paste this code inside the HTML head:
@@ -85,6 +146,7 @@ m.parentNode.insertBefore(a,m)})('https://s3-eu-west-1.amazonaws.com/com-liferay
 </script>
 ```
 
+The `analyticsKey` is an identifier associated to your Liferay account.
 The identity of the user generating the events will be automatically determined by the Analytics Client and the Identify Service.
 However, you can manually provide its identity by calling the `setIdentity` method of the Analytics object:
 
@@ -93,7 +155,7 @@ However, you can manually provide its identity by calling the `setIdentity` meth
     Analytics.setIdentity({ email: 'foo@bar.com', name: 'Foo' });
 ```
 
-You can track custom events by invoking the `send` method of the Analytics object. For example: 
+You can track custom events by invoking the `send` method of the Analytics object. For example:
 
 ```html
     element.addEventListener('click', function(evt) {
@@ -101,5 +163,5 @@ You can track custom events by invoking the `send` method of the Analytics objec
     });
 ```
 
-The first argument of the `send` method identifies the event (e.g. `share`) and the second identifies the application associated to it (e.g. `Blogs`). 
+The first argument of the `send` method identifies the event (e.g. `share`) and the second identifies the application associated to it (e.g. `Blogs`).
 Through the third optional argument you can pass some extra information.

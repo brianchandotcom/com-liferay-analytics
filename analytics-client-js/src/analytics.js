@@ -38,7 +38,7 @@ class Analytics {
 		instance._sendData = client.send.bind(client, instance);
 
 		instance.config = config;
-		instance.identityEndpoint = `http://pulpo-engine-contacts-prod.eu-west-1.elasticbeanstalk.com/${config.analyticsKey}/identity`;
+		instance.identityEndpoint = `https://contacts-prod.liferay.com/${config.analyticsKey}/identity`;
 		instance.events = storage.get(STORAGE_KEY_EVENTS) || [];
 		instance.isFlushInProgress = false;
 

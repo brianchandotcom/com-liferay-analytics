@@ -2,4 +2,5 @@
 
 <suppressions>
 	<suppress checks="JavaModuleInternalImportsCheck" files="/analytics-client-impl/src/main/java/com/liferay/analytics/client/impl/AnalyticsClientImpl\.java" />
+	<suppress checks="JavaModuleInternalImportsCheck" files="/analytics-client-impl/src/main/java/com/liferay/analytics/client/impl/IdentityClientImpl\.java" />
 </suppressions>
