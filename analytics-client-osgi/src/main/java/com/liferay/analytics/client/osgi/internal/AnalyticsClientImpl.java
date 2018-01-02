@@ -25,12 +25,15 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.TimeZoneThreadLocal;
 
 import java.util.Dictionary;
 import java.util.Properties;
+
+import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.ComponentFactory;
 import org.osgi.service.component.ComponentInstance;
@@ -90,8 +93,13 @@ public class AnalyticsClientImpl implements AnalyticsClient {
 	}
 
 	protected String getUserId(String analyticsKey) throws Exception {
-		if (IdentityThreadLocal.getUserId() != null) {
-			return IdentityThreadLocal.getUserId();
+		HttpSession session = PortalSessionThreadLocal.getHttpSession();
+
+		if ((session != null) &&
+			(session.getAttribute(_ANALYTICS_USER_ID_ATTRIBUTE_NAME) != null)) {
+
+			return (String)session.getAttribute(
+				_ANALYTICS_USER_ID_ATTRIBUTE_NAME);
 		}
 
 		IdentityContextMessage.Builder identityContextMessageBuilder =
@@ -129,7 +137,9 @@ public class AnalyticsClientImpl implements AnalyticsClient {
 		String userId = _identityClient.getUserId(
 			identityContextMessageBuilder.build());
 
-		IdentityThreadLocal.setUserId(userId);
+		if (session != null) {
+			session.setAttribute(_ANALYTICS_USER_ID_ATTRIBUTE_NAME, userId);
+		}
 
 		return userId;
 	}
@@ -173,6 +183,9 @@ public class AnalyticsClientImpl implements AnalyticsClient {
 
 	private static final String _ANALYTICS_GATEWAY_PROTOCOL =
 		System.getProperty("analytics.gateway.protocol", "https");
+
+	private static final String _ANALYTICS_USER_ID_ATTRIBUTE_NAME =
+		"ANALYTICS_USER_ID";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AnalyticsClientImpl.class);
