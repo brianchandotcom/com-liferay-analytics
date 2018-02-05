@@ -165,3 +165,34 @@ You can track custom events by invoking the `send` method of the Analytics objec
 
 The first argument of the `send` method identifies the event (e.g. `share`) and the second identifies the application associated to it (e.g. `Blogs`).
 Through the third optional argument you can pass some extra information.
+
+## Events and Properties
+
+Events are representations of actions performed by users. Events are composed by an ``id`` and their ``properties``.
+
+Every ``event`` is uniquely identified by its ``id``, which should be a string of characters following the [camel-case](https://en.wikipedia.org/wiki/Camel_case) convention. The contents of an ``id``, should follow the ``objectAction`` pattern. Where ``object`` refers what you are tracking (Form, Blog, Scroll) and ``Action`` refers to what action the user just performed (Focused, Viewed, Reached) on that ``object``. ``Action`` should be written in the past tense.
+
+Properties of an ``event`` are a map contaning information about that particular ``event``. Keys of that map should also follow the [camel-case](https://en.wikipedia.org/wiki/Camel_case) convention.
+
+### Form Events
+
+| Object  | Action    | Event Id      | Event Properties                 |
+| ------- | --------- | ------------- | -------------------------------- |
+| Field   | Blurred   | fieldBlurred  | fieldName, formId, focusDuration |
+| Field   | Focused   | fieldFocused  | fieldName, formId                |
+| Form    | Submitted | formSubmitted | formId                           |
+| Form    | Viewed    | formViewed    | formId                           |
+
+### Form Event Properties
+
+#### fieldName: String
+
+The name attribute of the HTML field.
+
+#### formId: String
+
+The identifier for the Form.
+
+#### focusDuration: Long
+
+Time elapsed since the field received focus.
